@@ -1,5 +1,7 @@
 const Mindrawing = require('mindrawingjs')
 const Vehicle = require('./vehicle')
+const Road = require('./road')
+const Point = require('./point')
 let myApp = angular.module('myApp', [])
 
 let lastMouse = {
@@ -18,23 +20,18 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   let rect = $s.d.c.parentNode.getBoundingClientRect()
   $s.d.setCanvasSize(rect.width, rect.height)
   $s.d.background('black')
-
+  
   $s.car = new Vehicle($s.d.width / 2, $s.d.height / 2)
-
-  // $s.d.fill('red')
-  // $s.d.rect(0, $s.d.height - 10, $s.d.width, 10)
+  let road1 = new Road(new Point(100, 100), new Point(500, 100))
+  $s.car.addWaypoint(road1.start)
+  $s.car.addWaypoint(road1.finish)
+  $s.car.addWaypoint(new Point($s.car.pos.x, $s.car.pos.y))
 
   $interval(() => {
     $s.car.tick()
-    $s.car.setDest(lastMouse.x, lastMouse.y)
-
-    $s.d.background('black')
-    // $s.car.pos.x++
-    // if ($s.car.pos.x >= $s.d.width - $s.car.size.x) $s.car.pos.x = 0
-
-    // $s.d.fill('red')
+    
+    $s.d.background('green')
+    road1.draw($s.d)
     $s.car.draw($s.d)
-    // $s.d.ellipse(lastMouse.x, lastMouse.y, 5)
-
   }, 1/ 30)
 }])
