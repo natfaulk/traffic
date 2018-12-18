@@ -21,17 +21,34 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   $s.d.setCanvasSize(rect.width, rect.height)
   $s.d.background('black')
   
-  $s.car = new Vehicle($s.d.width / 2, $s.d.height / 2)
-  let road1 = new Road(new Point(100, 100), new Point(500, 100))
-  $s.car.addWaypoint(road1.start)
-  $s.car.addWaypoint(road1.finish)
-  $s.car.addWaypoint(new Point($s.car.pos.x, $s.car.pos.y))
+  // let road1 = new Road(new Point(100, 100), new Point(500, 100))
+  $s.cars = []
+  $s.roads = []
+  $s.roads.push(new Road(new Point(100, 100), new Point(500, 100)))
+  $s.roads.push(new Road(new Point(500, 100), new Point(300, 300)))
 
+
+  for (let i = 0; i < 10; i++) {
+    let tempCar = new Vehicle(Math.random() * $s.d.width, Math.random() * $s.d.height)
+    tempCar.addWaypoint($s.roads[0].start)
+    tempCar.addWaypoint($s.roads[0].finish)
+    tempCar.addWaypoint($s.roads[1].finish)
+    tempCar.addWaypoint(new Point(tempCar.pos.x, tempCar.pos.y))
+    $s.cars.push(tempCar)
+  }
+  
   $interval(() => {
-    $s.car.tick()
+    $s.cars.forEach(car => {
+      car.tick()
+    })
     
     $s.d.background('green')
-    road1.draw($s.d)
-    $s.car.draw($s.d)
+    
+    $s.roads.forEach(road => {
+      road.draw($s.d)
+    })
+    $s.cars.forEach(car => {
+      car.draw($s.d)
+    })
   }, 1/ 30)
 }])
