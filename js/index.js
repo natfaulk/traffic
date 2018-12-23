@@ -5,6 +5,7 @@ const Point = require('./point')
 let myApp = angular.module('myApp', [])
 const Settings = require('./settings')
 const Routing = require('./routing')
+const Savefiles = require('./savefiles')
 
 let lastMouse = {
   x: -1,
@@ -24,10 +25,13 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   }
 
   $s.tool = {
+    type: 'road',
     begin: false,
     pos1: new Point(),
     pos2: new Point()
   }
+
+  Savefiles.init()
   
   $s.d = new Mindrawing()
   $s.d.setup('display')
@@ -37,12 +41,21 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
   $s.d.c.addEventListener('mouseup', (e) => {
     // console.log(e.x, e.y)
-    if (!$s.tool.begin) $s.tool.pos1 = new Point(e.x, e.y)
-    else {
-      $s.tool.pos2 = new Point(e.x, e.y)
-      $s.roads.push(new Road($s.tool.pos1, $s.tool.pos2, $s.settings.numLanes))
+    if ($s.tool.type == 'road') {
+      if (!$s.tool.begin) $s.tool.pos1 = new Point(e.x, e.y)
+      else {
+        $s.tool.pos2 = new Point(e.x, e.y)
+        $s.roads.push(new Road($s.tool.pos1, $s.tool.pos2, $s.settings.numLanes))
+      }
+      $s.tool.begin = !$s.tool.begin
+    } else if ($s.tool.type == 'vehicleSource') {
+      routingObjs.push(new Routing.VehicleSource(e.x, e.y))
+    } else if ($s.tool.type == 'vehicleSink') {
+      routingObjs.push(new Routing.VehicleSink(e.x, e.y))
+    } else if ($s.tool.type == 'intersection') {
+      routingObjs.push(new Routing.Intersection(e.x, e.y))
     }
-    $s.tool.begin = !$s.tool.begin
+
   })
   
   // let road1 = new Road(new Point(100, 100), new Point(500, 100))
@@ -62,10 +75,10 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   // }
 
   let routingObjs = []
-  routingObjs.push(new Routing.VehicleSource(100, 100))
-  routingObjs.push(new Routing.VehicleSink(500, 500))
-  routingObjs.push(new Routing.VehicleSink(400, 500))
-  routingObjs.push(new Routing.Intersection(300, 300))
+  // routingObjs.push(new Routing.VehicleSource(100, 100))
+  // routingObjs.push(new Routing.VehicleSink(500, 500))
+  // routingObjs.push(new Routing.VehicleSink(400, 500))
+  // routingObjs.push(new Routing.Intersection(300, 300))
   
   $interval(() => {
     $s.cars.forEach(car => {
@@ -100,4 +113,16 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
     if ($s.tool.begin) $s.d.line($s.tool.pos1.x, $s.tool.pos1.y, lastMouse.x, lastMouse.y)
   }, 1/ 30)
+
+  $s.save = () => {
+    Savefiles.save('test.json', $s.roads, routingObjs)
+  }
+
+  $s.load = () => {
+    Savefiles.load('test.json', (_roads, _robjs) => {
+      console.log('Loaded')
+      $s.roads = _roads
+      routingObjs = _robjs
+    })
+  }
 }])
