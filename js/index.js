@@ -4,6 +4,7 @@ const Road = require('./road')
 const Point = require('./point')
 let myApp = angular.module('myApp', [])
 const Settings = require('./settings')
+const Routing = require('./routing')
 
 let lastMouse = {
   x: -1,
@@ -17,8 +18,9 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   }
 
   $s.settings = {
-    showGrid: true,
-    numLanes: 2
+    showGrid: false,
+    numLanes: 2,
+    showRouting: true
   }
 
   $s.tool = {
@@ -46,18 +48,24 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   // let road1 = new Road(new Point(100, 100), new Point(500, 100))
   $s.cars = []
   $s.roads = []
-  $s.roads.push(new Road(new Point(100, 100), new Point(500, 100), 8))
-  $s.roads.push(new Road(new Point(500, 100), new Point(300, 300), 4))
+  // $s.roads.push(new Road(new Point(100, 100), new Point(500, 100), 8))
+  // $s.roads.push(new Road(new Point(500, 100), new Point(300, 300), 4))
 
 
-  for (let i = 0; i < 10; i++) {
-    let tempCar = new Vehicle(Math.random() * $s.d.width, Math.random() * $s.d.height)
-    tempCar.addWaypoint($s.roads[0].start)
-    tempCar.addWaypoint($s.roads[0].finish)
-    tempCar.addWaypoint($s.roads[1].finish)
-    tempCar.addWaypoint(new Point(tempCar.pos.x, tempCar.pos.y))
-    $s.cars.push(tempCar)
-  }
+  // for (let i = 0; i < 10; i++) {
+  //   let tempCar = new Vehicle(Math.random() * $s.d.width, Math.random() * $s.d.height)
+  //   tempCar.addWaypoint($s.roads[0].start)
+  //   tempCar.addWaypoint($s.roads[0].finish)
+  //   tempCar.addWaypoint($s.roads[1].finish)
+  //   tempCar.addWaypoint(new Point(tempCar.pos.x, tempCar.pos.y))
+  //   $s.cars.push(tempCar)
+  // }
+
+  let routingObjs = []
+  routingObjs.push(new Routing.VehicleSource(100, 100))
+  routingObjs.push(new Routing.VehicleSink(500, 500))
+  routingObjs.push(new Routing.VehicleSink(400, 500))
+  routingObjs.push(new Routing.Intersection(300, 300))
   
   $interval(() => {
     $s.cars.forEach(car => {
@@ -83,6 +91,12 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     $s.cars.forEach(car => {
       car.draw($s.d)
     })
+
+    if ($s.settings.showRouting) {
+      routingObjs.forEach(ro => {
+        ro.draw($s.d)
+      })
+    }
 
     if ($s.tool.begin) $s.d.line($s.tool.pos1.x, $s.tool.pos1.y, lastMouse.x, lastMouse.y)
   }, 1/ 30)
