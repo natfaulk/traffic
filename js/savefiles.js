@@ -34,15 +34,17 @@ module.exports = {
       else {
         let roads = []
         let rObjs = []
+        let vehicles = []
         let d = JSON.parse(data)
         d.roads.forEach(road => {
           roads.push(new Road(road.start, road.finish, road.lanes))
         })
         d.routingObjects.forEach(obj => {
-          rObjs.push(new Routing[obj.type](obj.pos.x, obj.pos.y))
+          console.log(obj.intervalTime)
+          rObjs.push(new Routing[obj.type](obj.pos.x, obj.pos.y, obj.intervalTime, vehicles))
         })
 
-        _callback(roads, rObjs)
+        _callback(roads, rObjs, vehicles)
       }
     })
   }

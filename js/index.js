@@ -21,7 +21,8 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   $s.settings = {
     showGrid: false,
     numLanes: 2,
-    showRouting: true
+    showRouting: true,
+    vehTime: 5000
   }
 
   $s.tool = {
@@ -32,6 +33,10 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   }
 
   Savefiles.init()
+
+  $s.cars = []
+  $s.roads = []
+  let routingObjs = []
   
   $s.d = new Mindrawing()
   $s.d.setup('display')
@@ -49,7 +54,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       }
       $s.tool.begin = !$s.tool.begin
     } else if ($s.tool.type == 'vehicleSource') {
-      routingObjs.push(new Routing.VehicleSource(e.x, e.y))
+      routingObjs.push(new Routing.VehicleSource(e.x, e.y, $s.settings.vehTime, $s.cars))
     } else if ($s.tool.type == 'vehicleSink') {
       routingObjs.push(new Routing.VehicleSink(e.x, e.y))
     } else if ($s.tool.type == 'intersection') {
@@ -59,8 +64,8 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   })
   
   // let road1 = new Road(new Point(100, 100), new Point(500, 100))
-  $s.cars = []
-  $s.roads = []
+ 
+
   // $s.roads.push(new Road(new Point(100, 100), new Point(500, 100), 8))
   // $s.roads.push(new Road(new Point(500, 100), new Point(300, 300), 4))
 
@@ -74,7 +79,6 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   //   $s.cars.push(tempCar)
   // }
 
-  let routingObjs = []
   // routingObjs.push(new Routing.VehicleSource(100, 100))
   // routingObjs.push(new Routing.VehicleSink(500, 500))
   // routingObjs.push(new Routing.VehicleSink(400, 500))
@@ -84,6 +88,9 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     $s.cars.forEach(car => {
       car.tick()
     })
+    for (let i = 0; i < $s.cars.length; i++) {
+      if ($s.cars[i].finished()) $s.cars.splice(i, 1)
+    }
     
     $s.d.background('green')
 
@@ -101,15 +108,14 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     $s.roads.forEach(road => {
       road.draw($s.d)
     })
-    $s.cars.forEach(car => {
-      car.draw($s.d)
-    })
-
     if ($s.settings.showRouting) {
       routingObjs.forEach(ro => {
         ro.draw($s.d)
       })
     }
+    $s.cars.forEach(car => {
+      car.draw($s.d)
+    })
 
     if ($s.tool.begin) $s.d.line($s.tool.pos1.x, $s.tool.pos1.y, lastMouse.x, lastMouse.y)
   }, 1/ 30)
@@ -119,7 +125,10 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   }
 
   $s.load = () => {
-    Savefiles.load('test.json', (_roads, _robjs) => {
+    // delete all routing objs else vehicle sources still generate
+    routingObjs.forEach(robj => robj.delete())
+    Savefiles.load('test.json', (_roads, _robjs, _vehicles) => {
+      $s.cars = _vehicles
       console.log('Loaded')
       $s.roads = _roads
       routingObjs = _robjs

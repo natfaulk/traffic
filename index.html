@@ -19,7 +19,8 @@
       <br><br>
       Tool type: {{tool.type}}<br>
       <button ng-click="tool.type='road'">Road</button><br>
-      <button ng-click="tool.type='vehicleSource'">Vehicle source</button><br>
+      <button ng-click="tool.type='vehicleSource'">Vehicle source</button>
+      Vehicle generation interval: <input type="number" ng-model="settings.vehTime"><br>
       <button ng-click="tool.type='vehicleSink'">Vehicle sink</button><br>
       <button ng-click="tool.type='intersection'">Intersection</button><br>
       <br>

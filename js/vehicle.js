@@ -45,4 +45,8 @@ module.exports = class Vehicle {
       }
     }
   }
+
+  finished() {
+    return this.waypoints.length == 0
+  }
 }
