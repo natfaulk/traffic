@@ -8,7 +8,12 @@
   </head>
   
   <body ng-controller="display">
-    <canvas id="display"></canvas>
+    <div id="main">
+      <canvas id="display"></canvas>
+    </div>
+    <div id="debug">
+      Show grid lines <input type="checkbox" ng-model="settings.showGrid">
+    </div>
     <script>require('angular')</script>
     <script>require('./js/index.js')</script>
   </body>

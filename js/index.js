@@ -3,6 +3,7 @@ const Vehicle = require('./vehicle')
 const Road = require('./road')
 const Point = require('./point')
 let myApp = angular.module('myApp', [])
+const Settings = require('./settings')
 
 let lastMouse = {
   x: -1,
@@ -13,6 +14,10 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   document.onmousemove = (event) => {
     lastMouse.x = event.pageX
     lastMouse.y = event.pageY
+  }
+
+  $s.settings = {
+    showGrid: true
   }
   
   $s.d = new Mindrawing()
@@ -43,6 +48,17 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     })
     
     $s.d.background('green')
+
+    if ($s.settings.showGrid) {
+      $s.d.stroke('white')
+      $s.d.strokeWeight(1)      
+      for (let i = 0; i < $s.d.width; i += Settings.GRID_SIZE) {
+        $s.d.line(i, 0, i, $s.d.height)
+      }
+      for (let i = 0; i < $s.d.height; i += Settings.GRID_SIZE) {
+        $s.d.line(0, i, $s.d.height, i)
+      }
+    }
     
     $s.roads.forEach(road => {
       road.draw($s.d)
