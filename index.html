@@ -12,7 +12,10 @@
       <canvas id="display"></canvas>
     </div>
     <div id="debug">
-      Show grid lines <input type="checkbox" ng-model="settings.showGrid">
+      Show grid lines <input type="checkbox" ng-model="settings.showGrid"><br>
+      <button ng-click="roads=[]">Clear roads</button><br>
+      Number of lanes <input type="text" ng-model="settings.numLanes">
+
     </div>
     <script>require('angular')</script>
     <script>require('./js/index.js')</script>
