@@ -47,12 +47,15 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   $s.d.c.addEventListener('mouseup', (e) => {
     // console.log(e.x, e.y)
     if ($s.tool.type == 'road') {
-      if (!$s.tool.begin) $s.tool.pos1 = new Point(e.x, e.y)
-      else {
-        $s.tool.pos2 = new Point(e.x, e.y)
-        $s.roads.push(new Road($s.tool.pos1, $s.tool.pos2, $s.settings.numLanes))
-      }
-      $s.tool.begin = !$s.tool.begin
+      if (routingObjs.length >= 2) {
+        let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y), routingObjs)
+        if (!$s.tool.begin) $s.tool.pos1 = closest.pos
+        else {
+          $s.tool.pos2 = closest.pos
+          $s.roads.push(new Road($s.tool.pos1, $s.tool.pos2, $s.settings.numLanes))
+        }
+        $s.tool.begin = !$s.tool.begin
+      } else console.log('Not enough routing objs')
     } else if ($s.tool.type == 'vehicleSource') {
       routingObjs.push(new Routing.VehicleSource(e.x, e.y, $s.settings.vehTime, $s.cars))
     } else if ($s.tool.type == 'vehicleSink') {
@@ -110,8 +113,12 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     })
     if ($s.settings.showRouting) {
       routingObjs.forEach(ro => {
+        // draw each ro
         ro.draw($s.d)
       })
+
+      let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y), routingObjs)
+      if (closest) closest.drawHighlight($s.d)
     }
     $s.cars.forEach(car => {
       car.draw($s.d)
