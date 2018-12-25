@@ -3,12 +3,14 @@ const Point = require('./point')
 const Settings = require('./settings')
 
 let uid = 0
+let routableObjs = []
 
 class Routable{
   constructor(_x, _y) {
     this.pos = new Point(_x, _y)
     this.children = []
     this.uid = uid++
+    routableObjs.push(this)
   }
 
   delete() {}
@@ -20,11 +22,22 @@ class Routable{
   }
 }
 
+let getByUid = _uid => {
+  let out = undefined
+  routableObjs.forEach(obj => {
+    if (obj.uid == _uid) out = obj
+  })
+  if (out == undefined) console.log('passed invalid uid')
+  return out
+}
+
 module.exports = {
-  getClosest: (_obj, _routables) => {
+  all: routableObjs,
+  getByUid: getByUid,
+  getClosest: (_obj) => {
     let min = undefined
     let minDist = undefined
-    _routables.forEach(ro => {
+    routableObjs.forEach(ro => {
       let dist = Point.distance(ro.pos, _obj)
       if (min) {
         if (dist < minDist) {
@@ -52,8 +65,9 @@ module.exports = {
           let timeout = 0
           while (timeout < Settings.MAX_WAYPOINTS) {
             let index = Math.floor(Math.random() * currentNode.children.length)
-            tempVeh.addWaypoint(currentNode.children[index].pos)
-            currentNode = currentNode.children[index]
+            let childNode = getByUid(currentNode.children[index])
+            tempVeh.addWaypoint(childNode.pos)
+            currentNode = childNode
             timeout++
             if (currentNode.children.length <= 0) break
             // console.log(currentNode)

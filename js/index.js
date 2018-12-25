@@ -22,7 +22,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     showGrid: false,
     numLanes: 2,
     showRouting: true,
-    vehTime: 5000
+    vehTime: 50
   }
 
   $s.tool = {
@@ -36,7 +36,6 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
   $s.cars = []
   $s.roads = []
-  let routingObjs = []
   
   $s.d = new Mindrawing()
   $s.d.setup('display')
@@ -45,10 +44,9 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   $s.d.background('black')
 
   $s.d.c.addEventListener('mouseup', (e) => {
-    // console.log(e.x, e.y)
     if ($s.tool.type == 'road') {
-      if (routingObjs.length >= 2) {
-        let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y), routingObjs)
+      if (Routing.all.length >= 2) {
+        let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y))
         if (!$s.tool.begin) $s.tool.pos1 = closest
         else {
           $s.tool.pos2 = closest
@@ -56,41 +54,19 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
           let type1 = $s.tool.pos1.__proto__.constructor.name
           let type2 = $s.tool.pos2.__proto__.constructor.name
-          if ((type1 == 'VehicleSource' || type1 == 'Intersection') && (type2 == 'VehicleSink' || type2 == 'Intersection')) $s.tool.pos1.children.push($s.tool.pos2)
-          if ((type2 == 'VehicleSource' || type2 == 'Intersection') && (type1 == 'VehicleSink' || type1 == 'Intersection')) $s.tool.pos2.children.push($s.tool.pos1)
+          if ((type1 == 'VehicleSource' || type1 == 'Intersection') && (type2 == 'VehicleSink' || type2 == 'Intersection')) $s.tool.pos1.children.push($s.tool.pos2.uid)
+          if ((type2 == 'VehicleSource' || type2 == 'Intersection') && (type1 == 'VehicleSink' || type1 == 'Intersection')) $s.tool.pos2.children.push($s.tool.pos1.uid)
         }
         $s.tool.begin = !$s.tool.begin
       } else console.log('Not enough routing objs')
     } else if ($s.tool.type == 'vehicleSource') {
-      routingObjs.push(new Routing.VehicleSource(e.x, e.y, $s.settings.vehTime, $s.cars))
+      new Routing.VehicleSource(e.x, e.y, $s.settings.vehTime, $s.cars)
     } else if ($s.tool.type == 'vehicleSink') {
-      routingObjs.push(new Routing.VehicleSink(e.x, e.y))
+      new Routing.VehicleSink(e.x, e.y)
     } else if ($s.tool.type == 'intersection') {
-      routingObjs.push(new Routing.Intersection(e.x, e.y))
+      new Routing.Intersection(e.x, e.y)
     }
-
   })
-  
-  // let road1 = new Road(new Point(100, 100), new Point(500, 100))
- 
-
-  // $s.roads.push(new Road(new Point(100, 100), new Point(500, 100), 8))
-  // $s.roads.push(new Road(new Point(500, 100), new Point(300, 300), 4))
-
-
-  // for (let i = 0; i < 10; i++) {
-  //   let tempCar = new Vehicle(Math.random() * $s.d.width, Math.random() * $s.d.height)
-  //   tempCar.addWaypoint($s.roads[0].start)
-  //   tempCar.addWaypoint($s.roads[0].finish)
-  //   tempCar.addWaypoint($s.roads[1].finish)
-  //   tempCar.addWaypoint(new Point(tempCar.pos.x, tempCar.pos.y))
-  //   $s.cars.push(tempCar)
-  // }
-
-  // routingObjs.push(new Routing.VehicleSource(100, 100))
-  // routingObjs.push(new Routing.VehicleSink(500, 500))
-  // routingObjs.push(new Routing.VehicleSink(400, 500))
-  // routingObjs.push(new Routing.Intersection(300, 300))
   
   $interval(() => {
     $s.cars.forEach(car => {
@@ -117,12 +93,12 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       road.draw($s.d)
     })
     if ($s.settings.showRouting) {
-      routingObjs.forEach(ro => {
+      Routing.all.forEach(ro => {
         // draw each ro
         ro.draw($s.d)
       })
 
-      let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y), routingObjs)
+      let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y))
       if (closest) closest.drawHighlight($s.d)
     }
     $s.cars.forEach(car => {
@@ -133,17 +109,17 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   }, 1/ 30)
 
   $s.save = () => {
-    Savefiles.save('test.json', $s.roads, routingObjs)
+    Savefiles.save('test.json', $s.roads, Routing.all)
   }
 
   $s.load = () => {
     // delete all routing objs else vehicle sources still generate
-    routingObjs.forEach(robj => robj.delete())
+    Routing.all.forEach(robj => robj.delete())
     Savefiles.load('test.json', (_roads, _robjs, _vehicles) => {
       $s.cars = _vehicles
       console.log('Loaded')
       $s.roads = _roads
-      routingObjs = _robjs
+      Routing.all = _robjs
     })
   }
 }])

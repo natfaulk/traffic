@@ -43,25 +43,26 @@ module.exports = {
         d.routingObjects.forEach(obj => {
           let tempObj = new Routing[obj.type](obj.pos.x, obj.pos.y, obj.intervalTime, vehicles)
           tempObj.uid = obj.uid
+          tempObj.children = obj.children
           // in case uid goes higher than current
           if (obj.uid > maxUid) maxUid = obj.uid
-          tempObj._children = []
-          obj.children.forEach(c => {
-            tempObj._children.push(c.uid)
-          })
+          // tempObj._children = []
+          // obj.children.forEach(c => {
+          //   tempObj._children.push(c.uid)
+          // })
           rObjs.push(tempObj)
         })
         Routing.setUID(maxUid + 1)
 
         // sort out children
-        rObjs.forEach(robj => {
-          robj._children.forEach(c_uid => {
-            d.routingObjects.forEach(robj_in => {
-              if (robj_in.uid == c_uid) robj.children.push(robj_in)
-            })
-          })
-          robj._children = undefined
-        })
+        // rObjs.forEach(robj => {
+        //   robj._children.forEach(c_uid => {
+        //     d.routingObjects.forEach(robj_in => {
+        //       if (robj_in.uid == c_uid) robj.children.push(robj_in)
+        //     })
+        //   })
+        //   robj._children = undefined
+        // })
 
         _callback(roads, rObjs, vehicles)
       }
