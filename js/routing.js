@@ -1,5 +1,6 @@
 const Vehicle = require('./vehicle')
 const Point = require('./point')
+const Settings = require('./settings')
 
 let uid = 0
 
@@ -47,8 +48,16 @@ module.exports = {
       if (_interval > 0) this.interval = setInterval(() => {
         if (this.children.length > 0) {
           let tempVeh = new Vehicle(this.pos.x, this.pos.y)
-          let index = Math.floor(Math.random() * this.children.length)
-          tempVeh.addWaypoint(this.children[index].pos)
+          let currentNode = this
+          let timeout = 0
+          while (timeout < Settings.MAX_WAYPOINTS) {
+            let index = Math.floor(Math.random() * currentNode.children.length)
+            tempVeh.addWaypoint(currentNode.children[index].pos)
+            currentNode = currentNode.children[index]
+            timeout++
+            if (currentNode.children.length <= 0) break
+            // console.log(currentNode)
+          }
           _vehicles.push(tempVeh)
         }
       }, _interval)
