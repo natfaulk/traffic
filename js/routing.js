@@ -1,9 +1,13 @@
 const Vehicle = require('./vehicle')
 const Point = require('./point')
 
+let uid = 0
+
 class Routable{
   constructor(_x, _y) {
     this.pos = new Point(_x, _y)
+    this.children = []
+    this.uid = uid++
   }
 
   delete() {}
@@ -33,14 +37,20 @@ module.exports = {
     })
     return min
   },
+  setUID: (_uid) => {
+    uid = _uid
+  },
   VehicleSource: class extends Routable {
     constructor(_x = 0, _y = 0, _interval = 0, _vehicles = []) {
       super(_x, _y)
       this.intervalTime = _interval
       if (_interval > 0) this.interval = setInterval(() => {
-        let tempVeh = new Vehicle(this.pos.x, this.pos.y)
-        tempVeh.addWaypoint(new Point(500, 500))
-        _vehicles.push(tempVeh)
+        if (this.children.length > 0) {
+          let tempVeh = new Vehicle(this.pos.x, this.pos.y)
+          let index = Math.floor(Math.random() * this.children.length)
+          tempVeh.addWaypoint(this.children[index].pos)
+          _vehicles.push(tempVeh)
+        }
       }, _interval)
     }
 

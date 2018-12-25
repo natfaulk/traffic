@@ -39,9 +39,28 @@ module.exports = {
         d.roads.forEach(road => {
           roads.push(new Road(road.start, road.finish, road.lanes))
         })
+        let maxUid = 0
         d.routingObjects.forEach(obj => {
-          console.log(obj.intervalTime)
-          rObjs.push(new Routing[obj.type](obj.pos.x, obj.pos.y, obj.intervalTime, vehicles))
+          let tempObj = new Routing[obj.type](obj.pos.x, obj.pos.y, obj.intervalTime, vehicles)
+          tempObj.uid = obj.uid
+          // in case uid goes higher than current
+          if (obj.uid > maxUid) maxUid = obj.uid
+          tempObj._children = []
+          obj.children.forEach(c => {
+            tempObj._children.push(c.uid)
+          })
+          rObjs.push(tempObj)
+        })
+        Routing.setUID(maxUid + 1)
+
+        // sort out children
+        rObjs.forEach(robj => {
+          robj._children.forEach(c_uid => {
+            d.routingObjects.forEach(robj_in => {
+              if (robj_in.uid == c_uid) robj.children.push(robj_in)
+            })
+          })
+          robj._children = undefined
         })
 
         _callback(roads, rObjs, vehicles)

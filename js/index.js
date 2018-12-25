@@ -49,10 +49,12 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     if ($s.tool.type == 'road') {
       if (routingObjs.length >= 2) {
         let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y), routingObjs)
-        if (!$s.tool.begin) $s.tool.pos1 = closest.pos
+        if (!$s.tool.begin) $s.tool.pos1 = closest
         else {
-          $s.tool.pos2 = closest.pos
-          $s.roads.push(new Road($s.tool.pos1, $s.tool.pos2, $s.settings.numLanes))
+          $s.tool.pos2 = closest
+          $s.roads.push(new Road($s.tool.pos1.pos, $s.tool.pos2.pos, $s.settings.numLanes))
+          if ($s.tool.pos1.__proto__.constructor.name == 'VehicleSource') $s.tool.pos1.children.push($s.tool.pos2)
+          if ($s.tool.pos2.__proto__.constructor.name == 'VehicleSource') $s.tool.pos2.children.push($s.tool.pos1)
         }
         $s.tool.begin = !$s.tool.begin
       } else console.log('Not enough routing objs')
