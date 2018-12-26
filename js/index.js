@@ -45,7 +45,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
   $s.d.c.addEventListener('mouseup', (e) => {
     if ($s.tool.type == 'road') {
-      if (Routing.all.length >= 2) {
+      if (Routing.getAll().length >= 2) {
         let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y))
         if (!$s.tool.begin) $s.tool.pos1 = closest
         else {
@@ -93,7 +93,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       road.draw($s.d)
     })
     if ($s.settings.showRouting) {
-      Routing.all.forEach(ro => {
+      Routing.getAll().forEach(ro => {
         // draw each ro
         ro.draw($s.d)
       })
@@ -109,17 +109,17 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   }, 1/ 30)
 
   $s.save = () => {
-    Savefiles.save('test.json', $s.roads, Routing.all)
+    Savefiles.save('test.json', $s.roads, Routing.getAll())
   }
 
   $s.load = () => {
     // delete all routing objs else vehicle sources still generate
-    Routing.all.forEach(robj => robj.delete())
+    Routing.getAll().forEach(robj => robj.delete())
     Savefiles.load('test.json', (_roads, _robjs, _vehicles) => {
       $s.cars = _vehicles
       console.log('Loaded')
       $s.roads = _roads
-      Routing.all = _robjs
+      Routing.setAll(_robjs)
     })
   }
 }])

@@ -32,7 +32,10 @@ let getByUid = _uid => {
 }
 
 module.exports = {
-  all: routableObjs,
+  setAll: (_all) => {
+    routableObjs = _all
+  },
+  getAll: () => {return routableObjs},
   getByUid: getByUid,
   getClosest: (_obj) => {
     let min = undefined
