@@ -22,7 +22,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     showGrid: false,
     numLanes: 2,
     showRouting: true,
-    vehTime: 50
+    vehTime: Settings.DEFAULT_VEHICLE_INTERVAL
   }
 
   $s.tool = {
@@ -55,7 +55,6 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
           let type1 = $s.tool.pos1.__proto__.constructor.name
           let type2 = $s.tool.pos2.__proto__.constructor.name
           if ((type1 == 'VehicleSource' || type1 == 'Intersection') && (type2 == 'VehicleSink' || type2 == 'Intersection')) $s.tool.pos1.children.push($s.tool.pos2.uid)
-          if ((type2 == 'VehicleSource' || type2 == 'Intersection') && (type1 == 'VehicleSink' || type1 == 'Intersection')) $s.tool.pos2.children.push($s.tool.pos1.uid)
         }
         $s.tool.begin = !$s.tool.begin
       } else console.log('Not enough routing objs')
@@ -90,7 +89,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     }
     
     $s.roads.forEach(road => {
-      road.draw($s.d)
+      road.draw($s.d, $s.settings.showRouting)
     })
     if ($s.settings.showRouting) {
       Routing.getAll().forEach(ro => {

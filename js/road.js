@@ -8,7 +8,7 @@ module.exports = class Road {
     this.lanes = _lanes
   }
 
-  draw(_d) {
+  draw(_d, _routing = false) {
     _d.stroke('black')
     _d.strokeWeight(Settings.LANE_WIDTH * this.lanes)
     _d.line(this.start.x, this.start.y, this.finish.x, this.finish.y)
@@ -28,6 +28,17 @@ module.exports = class Road {
       _d.line(tempStart.x, tempStart.y, tempFinish.x, tempFinish.y)
       tempStart.add(temp)
       tempFinish.add(temp)
+    }
+    // only display if routing display enabled
+    if (_routing) {
+      // Temporary arrow at the front
+      temp.setFromPolar(ang + Math.PI / 2, -2 * Settings.LANE_WIDTH * this.lanes)
+      tempStart = new Point(this.finish.x, this.finish.y)
+      tempFinish = new Point(this.finish.x, this.finish.y)
+      tempStart.add(temp)
+      temp.setFromPolar(ang + Math.PI / 2, 2 * Settings.LANE_WIDTH * this.lanes)
+      tempFinish.add(temp)
+      _d.line(tempStart.x, tempStart.y, tempFinish.x, tempFinish.y)    
     }
   }
 }
