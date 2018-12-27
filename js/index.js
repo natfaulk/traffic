@@ -106,7 +106,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       if (closest) closest.drawHighlight($s.d)
     }
     $s.cars.forEach(car => {
-      car.draw($s.d)
+      car.draw($s.d, $s.settings.showRouting)
     })
 
     if ($s.tool.begin) $s.d.line($s.tool.pos1.x, $s.tool.pos1.y, lastMouse.x, lastMouse.y)

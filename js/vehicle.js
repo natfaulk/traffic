@@ -11,20 +11,16 @@ module.exports = class Vehicle {
     this.color = Utils.randomColour()
   }
 
-  draw(_d) {
+  draw(_d, _routing = false) {
     _d.strokeWeight(1)
     _d.stroke('black')
     _d.fill(`rgb(${this.color[0]},${this.color[1]},${this.color[2]})`)
-    _d.rotatedRect(this.pos.x + 0.5, this.pos.y + 0.5, this.size.x, this.size.y, this.angle)
-    if (this.waypoints.length > 0) {
+    _d.rotatedRect(this.pos.x, this.pos.y, this.size.x, this.size.y, this.angle, this.size.x, this.size.y / 2)
+    if (_routing && this.waypoints.length > 0) {
       _d.fill('green')
       _d.ellipse(this.waypoints[0].x, this.waypoints[0].y, 5)
     }
   }
-
-  // setDest(_p) {
-  //   this.dest = _p
-  // }
 
   addWaypoint(_p) {
     this.waypoints.push(_p)

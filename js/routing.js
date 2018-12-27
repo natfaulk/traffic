@@ -5,6 +5,8 @@ const Settings = require('./settings')
 let uid = 0
 let routableObjs = []
 
+const DRAW_SIZE = Settings.GRID_SIZE - 4
+
 class Routable{
   constructor(_x, _y) {
     this.pos = new Point(_x, _y)
@@ -82,9 +84,7 @@ module.exports = {
 
     draw(_d) {
       _d.fill('blue')
-      _d.ellipse(this.pos.x, this.pos.y, 20)
-      _d.fill('red')
-      _d.rect(this.pos.x - 5, this.pos.y - 5, 10, 10)
+      _d.rect(this.pos.x - DRAW_SIZE / 2, this.pos.y - DRAW_SIZE / 2, DRAW_SIZE, DRAW_SIZE)
     }
 
     delete() {
@@ -99,7 +99,7 @@ module.exports = {
 
     draw(_d) {
       _d.fill('blue')
-      _d.ellipse(this.pos.x, this.pos.y, 20)
+      _d.ellipse(this.pos.x, this.pos.y, DRAW_SIZE)
     }
   },
 
@@ -110,7 +110,7 @@ module.exports = {
 
     draw(_d) {
       _d.fill('red')
-      _d.ellipse(this.pos.x, this.pos.y, 20)
+      _d.ellipse(this.pos.x, this.pos.y, DRAW_SIZE)
     }
   }
 }
