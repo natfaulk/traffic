@@ -1,11 +1,12 @@
 const Mindrawing = require('mindrawingjs')
-const Vehicle = require('./vehicle')
 const Road = require('./road')
 const Point = require('./point')
-let myApp = angular.module('myApp', [])
 const Settings = require('./settings')
 const Routing = require('./routing')
 const Savefiles = require('./savefiles')
+const Utils = require('./utils')
+
+let myApp = angular.module('myApp', [])
 
 let lastMouse = {
   x: -1,
@@ -20,6 +21,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
   $s.settings = {
     showGrid: false,
+    gridSnap: true,
     numLanes: 2,
     showRouting: true,
     vehTime: Settings.DEFAULT_VEHICLE_INTERVAL
@@ -44,6 +46,9 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   $s.d.background('black')
 
   $s.d.c.addEventListener('mouseup', (e) => {
+    let e2
+    if ($s.settings.gridSnap) e2 = Utils.snapToGrid(e, Settings.GRID_SIZE)
+    else e2 = e
     if ($s.tool.type == 'road') {
       if (Routing.getAll().length >= 2) {
         let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y))
@@ -59,11 +64,11 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
         $s.tool.begin = !$s.tool.begin
       } else console.log('Not enough routing objs')
     } else if ($s.tool.type == 'vehicleSource') {
-      new Routing.VehicleSource(e.x, e.y, $s.settings.vehTime, $s.cars)
+      new Routing.VehicleSource(e2.x, e2.y, $s.settings.vehTime, $s.cars)
     } else if ($s.tool.type == 'vehicleSink') {
-      new Routing.VehicleSink(e.x, e.y)
+      new Routing.VehicleSink(e2.x, e2.y)
     } else if ($s.tool.type == 'intersection') {
-      new Routing.Intersection(e.x, e.y)
+      new Routing.Intersection(e2.x, e2.y)
     }
   })
   
