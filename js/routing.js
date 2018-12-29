@@ -1,6 +1,7 @@
 const Vehicle = require('./vehicle')
 const Point = require('./point')
 const Settings = require('./settings')
+const Utils = require('./utils')
 
 let uid = 0
 let routableObjs = []
@@ -31,6 +32,17 @@ let getByUid = _uid => {
   })
   if (out == undefined) console.log('passed invalid uid')
   return out
+}
+
+let IntersectionNode = class extends Routable {
+  constructor(_x = 0, _y = 0) {
+    super(_x, _y)
+  }
+
+  draw(_d) {
+    _d.fill('red')
+    _d.ellipse(this.pos.x, this.pos.y, DRAW_SIZE)
+  }
 }
 
 module.exports = {
@@ -103,14 +115,41 @@ module.exports = {
     }
   },
 
-  Intersection: class extends Routable {
-    constructor(_x = 0, _y = 0) {
-      super(_x, _y)
+  IntersectionNode: IntersectionNode,
+
+  Intersection4_1: class {
+    constructor(_x = 0, _y = 0, _spacing = 2, _nodes = []) {
+      this.pos = Utils.snapToGrid(new Point(_x, _y), Settings.GRID_SIZE)
+      
+      if (_nodes.length == 0) {
+        let u = Settings.GRID_SIZE
+        let oset = _spacing
+        let tl = new IntersectionNode(this.pos.x - u, this.pos.y - oset * u)
+        let tr = new IntersectionNode(this.pos.x + u, this.pos.y - oset * u)
+        let rt = new IntersectionNode(this.pos.x + oset * u, this.pos.y - u)
+        let rb = new IntersectionNode(this.pos.x + oset * u, this.pos.y + u)
+        let br = new IntersectionNode(this.pos.x + u, this.pos.y + oset * u)
+        let bl = new IntersectionNode(this.pos.x - u, this.pos.y + oset * u)
+        let lb = new IntersectionNode(this.pos.x - oset * u, this.pos.y + u)
+        let lt = new IntersectionNode(this.pos.x - oset * u, this.pos.y - u)
+        this.nodes = [tl.uid, tr.uid, rt.uid, rb.uid, br.uid, bl.uid, lb.uid, lt.uid]
+        this.spacing = oset
+
+        tr.children = [rt.uid, br.uid, lb.uid]
+        bl.children = [rt.uid, tl.uid, lb.uid]
+        lt.children = [rt.uid, br.uid, tl.uid]
+        rb.children = [lb.uid, tl.uid, br.uid]
+      } else {
+        this.nodes = _nodes
+        this.spacing = _spacing
+      }
     }
 
     draw(_d) {
-      _d.fill('red')
-      _d.ellipse(this.pos.x, this.pos.y, DRAW_SIZE)
+      _d.fill('black')
+      _d.stroke('black')
+      let t = this.spacing * Settings.GRID_SIZE
+      _d.rect(this.pos.x - t, this.pos.y - t, t * 2, t * 2)
     }
   }
 }

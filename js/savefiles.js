@@ -14,10 +14,11 @@ module.exports = {
   init: () => {
     mkdir_p(path.join(__dirname, '..', 'saves'))
   },
-  save: (_fn, _roads, _routObjs) => {
+  save: (_fn, _roads, _routObjs, _ints) => {
     let out = {
       roads: _roads,
-      routingObjects: _routObjs
+      routingObjects: _routObjs,
+      intersections: _ints
     }
     out.routingObjects.forEach(robj => {
       robj.type = robj.__proto__.constructor.name
@@ -35,6 +36,7 @@ module.exports = {
         let roads = []
         let rObjs = []
         let vehicles = []
+        let ints = [] // intersections
         let d = JSON.parse(data)
         d.roads.forEach(road => {
           roads.push(new Road(road.start, road.finish, road.lanes))
@@ -54,17 +56,11 @@ module.exports = {
         })
         Routing.setUID(maxUid + 1)
 
-        // sort out children
-        // rObjs.forEach(robj => {
-        //   robj._children.forEach(c_uid => {
-        //     d.routingObjects.forEach(robj_in => {
-        //       if (robj_in.uid == c_uid) robj.children.push(robj_in)
-        //     })
-        //   })
-        //   robj._children = undefined
-        // })
+        if (d.intersections !== undefined) d.intersections.forEach(obj => {
+          ints.push(new Routing.Intersection4_1(obj.pos.x, obj.pos.y, obj.spacing, obj.nodes))
+        })
 
-        _callback(roads, rObjs, vehicles)
+        _callback(roads, rObjs, ints, vehicles)
       }
     })
   }
