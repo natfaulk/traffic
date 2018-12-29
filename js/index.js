@@ -69,6 +69,8 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       new Routing.VehicleSink(e2.x, e2.y)
     } else if ($s.tool.type == 'intersection') {
       new Routing.Intersection(e2.x, e2.y)
+    } else if ($s.tool.type == 'inspect') {
+      console.log(Routing.getClosest(new Point(lastMouse.x, lastMouse.y)))
     }
   })
   
