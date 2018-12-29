@@ -24,7 +24,9 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     gridSnap: true,
     numLanes: 1,
     showRouting: true,
-    vehTime: Settings.DEFAULT_VEHICLE_INTERVAL
+    vehTime: Settings.DEFAULT_VEHICLE_INTERVAL,
+    intRad: 2,
+    intSpac: 1
   }
 
   $s.tool = {
@@ -71,7 +73,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     } else if ($s.tool.type == 'intersection') {
       new Routing.IntersectionNode(e2.x, e2.y)
     } else if ($s.tool.type == 'intersection4_1') {
-      intersections.push(new Routing.Intersection4_1(e2.x, e2.y))
+      intersections.push(new Routing.Intersection4_1(e2.x, e2.y, $s.settings.intRad, $s.settings.intSpac))
     } else if ($s.tool.type == 'inspect') {
       console.log(Routing.getClosest(new Point(lastMouse.x, lastMouse.y)))
     }

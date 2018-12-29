@@ -118,22 +118,29 @@ module.exports = {
   IntersectionNode: IntersectionNode,
 
   Intersection4_1: class {
-    constructor(_x = 0, _y = 0, _spacing = 2, _nodes = []) {
+    // radius is the distance each pair of nodes is from the centre
+    // spacing is the distance between the pair of nodes
+    constructor(_x = 0, _y = 0, _radius = 2, _spacing = 2, _nodes = []) {
       this.pos = Utils.snapToGrid(new Point(_x, _y), Settings.GRID_SIZE)
-      
+      // ensure lines up on grid squares
+      // if (_spacing % 2 == 1) {
+      //   this.pos.x -= 0.5 * Settings.GRID_SIZE
+      //   this.pos.y -= 0.5 * Settings.GRID_SIZE
+      // }
+
       if (_nodes.length == 0) {
-        let u = Settings.GRID_SIZE
-        let oset = _spacing
-        let tl = new IntersectionNode(this.pos.x - u, this.pos.y - oset * u)
-        let tr = new IntersectionNode(this.pos.x + u, this.pos.y - oset * u)
-        let rt = new IntersectionNode(this.pos.x + oset * u, this.pos.y - u)
-        let rb = new IntersectionNode(this.pos.x + oset * u, this.pos.y + u)
-        let br = new IntersectionNode(this.pos.x + u, this.pos.y + oset * u)
-        let bl = new IntersectionNode(this.pos.x - u, this.pos.y + oset * u)
-        let lb = new IntersectionNode(this.pos.x - oset * u, this.pos.y + u)
-        let lt = new IntersectionNode(this.pos.x - oset * u, this.pos.y - u)
+        let r = Settings.GRID_SIZE * _radius
+        let s = Settings.GRID_SIZE * _spacing
+
+        let tl = new IntersectionNode(this.pos.x + (r - s/2), this.pos.y)
+        let tr = new IntersectionNode(this.pos.x + (r + s/2), this.pos.y)
+        let rt = new IntersectionNode(this.pos.x + 2 * r, this.pos.y + (r - s/2))
+        let rb = new IntersectionNode(this.pos.x + 2 * r, this.pos.y + (r + s/2))
+        let br = new IntersectionNode(this.pos.x + (r + s/2), this.pos.y + 2 * r)
+        let bl = new IntersectionNode(this.pos.x + (r - s/2), this.pos.y + 2 * r)
+        let lb = new IntersectionNode(this.pos.x, this.pos.y + (r + s/2))
+        let lt = new IntersectionNode(this.pos.x, this.pos.y + (r - s/2))
         this.nodes = [tl.uid, tr.uid, rt.uid, rb.uid, br.uid, bl.uid, lb.uid, lt.uid]
-        this.spacing = oset
 
         tr.children = [rt.uid, br.uid, lb.uid]
         bl.children = [rt.uid, tl.uid, lb.uid]
@@ -141,15 +148,16 @@ module.exports = {
         rb.children = [lb.uid, tl.uid, br.uid]
       } else {
         this.nodes = _nodes
-        this.spacing = _spacing
       }
+      this.spacing = _spacing
+      this.radius = _radius
     }
 
     draw(_d) {
       _d.fill('black')
       _d.stroke('black')
-      let t = this.spacing * Settings.GRID_SIZE
-      _d.rect(this.pos.x - t, this.pos.y - t, t * 2, t * 2)
+      let t = this.radius * Settings.GRID_SIZE
+      _d.rect(this.pos.x, this.pos.y, t * 2, t * 2)
     }
   }
 }

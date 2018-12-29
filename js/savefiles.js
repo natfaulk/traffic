@@ -57,7 +57,7 @@ module.exports = {
         Routing.setUID(maxUid + 1)
 
         if (d.intersections !== undefined) d.intersections.forEach(obj => {
-          ints.push(new Routing.Intersection4_1(obj.pos.x, obj.pos.y, obj.spacing, obj.nodes))
+          ints.push(new Routing.Intersection4_1(obj.pos.x, obj.pos.y, obj.radius, obj.spacing, obj.nodes))
         })
 
         _callback(roads, rObjs, ints, vehicles)
