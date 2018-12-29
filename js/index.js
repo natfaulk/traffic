@@ -96,7 +96,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
         $s.d.line(i, 0, i, $s.d.height)
       }
       for (let i = 0; i < $s.d.height; i += Settings.GRID_SIZE) {
-        $s.d.line(0, i, $s.d.height, i)
+        $s.d.line(0, i, $s.d.width, i)
       }
     }
     
