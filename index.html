@@ -15,6 +15,7 @@
       Show grid lines <input type="checkbox" ng-model="settings.showGrid"><br>
       Grid snapping <input type="checkbox" ng-model="settings.gridSnap"><br>
       Show routing <input type="checkbox" ng-model="settings.showRouting"><br>
+      Show vehicle waypoints <input type="checkbox" ng-model="settings.showWaypoints"><br>
       <button ng-click="roads=[]">Clear roads</button><br>
       Number of lanes <input type="text" ng-model="settings.numLanes">
       <br><br>
@@ -23,7 +24,8 @@
       <button ng-click="tool.type='vehicleSource'">Vehicle source</button>
       Vehicle generation interval: <input type="number" ng-model="settings.vehTime"><br>
       <button ng-click="tool.type='vehicleSink'">Vehicle sink</button><br>
-      <button ng-click="tool.type='intersection'">Intersection</button><br>
+      <button ng-click="tool.type='intersection'">Intersection</button>
+      Is traffic light? <input type="checkbox" ng-model="settings.intIsTrafficLight"><br>
       <button ng-click="tool.type='intersection4_1'">Intersection 4_1</button><br>
       Intersection node radius: <input type="number" ng-model="settings.intRad"><br>
       Intersection node spacing: <input type="number" ng-model="settings.intSpac"><br>

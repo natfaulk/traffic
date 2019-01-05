@@ -43,7 +43,8 @@ module.exports = {
         })
         let maxUid = 0
         d.routingObjects.forEach(obj => {
-          let tempObj = new Routing[obj.type](obj.pos.x, obj.pos.y, obj.intervalTime, vehicles)
+          let tempSettings = {interval: obj.intervalTime, vehicles: vehicles, trafficLight: obj.trafficLight}
+          let tempObj = new Routing[obj.type](obj.pos.x, obj.pos.y, tempSettings)
           tempObj.uid = obj.uid
           tempObj.children = obj.children
           // in case uid goes higher than current

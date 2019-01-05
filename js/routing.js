@@ -35,12 +35,23 @@ let getByUid = _uid => {
 }
 
 let IntersectionNode = class extends Routable {
-  constructor(_x = 0, _y = 0) {
+  constructor(_x = 0, _y = 0, _settings = {}) {
     super(_x, _y)
+    // (r)ed, (y)ellow or (g)reen
+    let tempRand = Math.floor(Math.random() * 3)
+    if (_settings.trafficLight === true) {
+      if (tempRand < 1) this.trafficLight = 'r'
+      else if (tempRand < 2) this.trafficLight = 'y'
+      else this.trafficLight = 'g'
+    } else if (_settings.trafficLight === false) this.trafficLight = undefined
+    else this.trafficLight = _settings.trafficLight
   }
 
   draw(_d) {
-    _d.fill('red')
+    if (this.trafficLight === undefined) _d.fill('white')
+    else if (this.trafficLight == 'r') _d.fill('red')
+    else if (this.trafficLight == 'y') _d.fill('yellow')
+    else if (this.trafficLight == 'g') _d.fill('green')
     _d.ellipse(this.pos.x, this.pos.y, DRAW_SIZE)
   }
 }
@@ -72,10 +83,10 @@ module.exports = {
     uid = _uid
   },
   VehicleSource: class extends Routable {
-    constructor(_x = 0, _y = 0, _interval = 0, _vehicles = []) {
+    constructor(_x = 0, _y = 0, _settings = {}) {
       super(_x, _y)
-      this.intervalTime = _interval
-      if (_interval > 0) this.interval = setInterval(() => {
+      this.intervalTime = _settings.interval
+      if (_settings.interval > 0) this.interval = setInterval(() => {
         if (this.children.length > 0) {
           let tempVeh = new Vehicle(this.pos.x, this.pos.y)
           let currentNode = this
@@ -89,9 +100,9 @@ module.exports = {
             if (currentNode.children.length <= 0) break
             // console.log(currentNode)
           }
-          _vehicles.push(tempVeh)
+          _settings.vehicles.push(tempVeh)
         }
-      }, _interval)
+      }, _settings.interval)
     }
 
     draw(_d) {
@@ -133,13 +144,13 @@ module.exports = {
         let s = Settings.GRID_SIZE * _spacing
 
         let tl = new IntersectionNode(this.pos.x + (r - s/2), this.pos.y)
-        let tr = new IntersectionNode(this.pos.x + (r + s/2), this.pos.y)
+        let tr = new IntersectionNode(this.pos.x + (r + s/2), this.pos.y, {trafficLight: true})
         let rt = new IntersectionNode(this.pos.x + 2 * r, this.pos.y + (r - s/2))
-        let rb = new IntersectionNode(this.pos.x + 2 * r, this.pos.y + (r + s/2))
+        let rb = new IntersectionNode(this.pos.x + 2 * r, this.pos.y + (r + s/2), {trafficLight: true})
         let br = new IntersectionNode(this.pos.x + (r + s/2), this.pos.y + 2 * r)
-        let bl = new IntersectionNode(this.pos.x + (r - s/2), this.pos.y + 2 * r)
+        let bl = new IntersectionNode(this.pos.x + (r - s/2), this.pos.y + 2 * r, {trafficLight: true})
         let lb = new IntersectionNode(this.pos.x, this.pos.y + (r + s/2))
-        let lt = new IntersectionNode(this.pos.x, this.pos.y + (r - s/2))
+        let lt = new IntersectionNode(this.pos.x, this.pos.y + (r - s/2), {trafficLight: true})
         this.nodes = [tl.uid, tr.uid, rt.uid, rb.uid, br.uid, bl.uid, lb.uid, lt.uid]
 
         tr.children = [rt.uid, br.uid, lb.uid]

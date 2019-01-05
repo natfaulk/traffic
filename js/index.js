@@ -24,9 +24,11 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     gridSnap: true,
     numLanes: 1,
     showRouting: true,
+    showWaypoints: false,
     vehTime: Settings.DEFAULT_VEHICLE_INTERVAL,
-    intRad: 2,
-    intSpac: 1
+    intRad: 1.5,
+    intSpac: 1,
+    intIsTrafficLight: true
   }
 
   $s.tool = {
@@ -67,11 +69,11 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
         $s.tool.begin = !$s.tool.begin
       } else console.log('Not enough routing objs')
     } else if ($s.tool.type == 'vehicleSource') {
-      new Routing.VehicleSource(e2.x, e2.y, $s.settings.vehTime, $s.cars)
+      new Routing.VehicleSource(e2.x, e2.y, {interval: $s.settings.vehTime, vehicles: $s.cars})
     } else if ($s.tool.type == 'vehicleSink') {
       new Routing.VehicleSink(e2.x, e2.y)
     } else if ($s.tool.type == 'intersection') {
-      new Routing.IntersectionNode(e2.x, e2.y)
+      new Routing.IntersectionNode(e2.x, e2.y, {trafficLight: $s.settings.intIsTrafficLight})
     } else if ($s.tool.type == 'intersection4_1') {
       intersections.push(new Routing.Intersection4_1(e2.x, e2.y, $s.settings.intRad, $s.settings.intSpac))
     } else if ($s.tool.type == 'inspect') {
@@ -117,7 +119,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       if (closest) closest.drawHighlight($s.d)
     }
     $s.cars.forEach(car => {
-      car.draw($s.d, $s.settings.showRouting)
+      car.draw($s.d, $s.settings.showWaypoints)
     })
 
     if ($s.tool.begin) $s.d.line($s.tool.pos1.x, $s.tool.pos1.y, lastMouse.x, lastMouse.y)
