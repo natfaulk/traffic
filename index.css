@@ -7,10 +7,12 @@ div#main {
   height: 100%;
   width: 80%;
   float: left;
+  overflow: hidden;
 }
 
 div#debug {
   float: left;
   height: 100%;
   width: 20%;
+  overflow: hidden;
 }
