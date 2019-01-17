@@ -35,7 +35,6 @@ module.exports = {
       else {
         let roads = []
         let rObjs = []
-        let vehicles = []
         let ints = [] // intersections
         let d = JSON.parse(data)
         d.roads.forEach(road => {
@@ -43,7 +42,7 @@ module.exports = {
         })
         let maxUid = 0
         d.routingObjects.forEach(obj => {
-          let tempSettings = {interval: obj.intervalTime, vehicles: vehicles, trafficLight: obj.trafficLight}
+          let tempSettings = {interval: obj.intervalTime, trafficLight: obj.trafficLight}
           let tempObj = new Routing[obj.type](obj.pos.x, obj.pos.y, tempSettings)
           tempObj.uid = obj.uid
           tempObj.children = obj.children
@@ -61,7 +60,7 @@ module.exports = {
           ints.push(new Routing.Intersection4_1(obj.pos.x, obj.pos.y, obj.radius, obj.spacing, obj.nodes))
         })
 
-        _callback(roads, rObjs, ints, vehicles)
+        _callback(roads, rObjs, ints)
       }
     })
   }

@@ -6,6 +6,8 @@ const Routing = require('./routing')
 const Savefiles = require('./savefiles')
 const Utils = require('./utils')
 
+const Vehicle = require('./vehicle')
+
 let myApp = angular.module('myApp', [])
 
 let lastMouse = {
@@ -13,10 +15,14 @@ let lastMouse = {
   y: -1
 }
 
+let testCar = new Vehicle(0, 0)
+
 myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   document.onmousemove = (event) => {
     lastMouse.x = event.pageX
     lastMouse.y = event.pageY
+    testCar.pos.x = lastMouse.x
+    testCar.pos.y = lastMouse.y
   }
 
   $s.settings = {
@@ -28,7 +34,8 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     vehTime: Settings.DEFAULT_VEHICLE_INTERVAL,
     intRad: 1.5,
     intSpac: 1,
-    intIsTrafficLight: true
+    intIsTrafficLight: true,
+    showVehCorners: false
   }
 
   $s.tool = {
@@ -40,7 +47,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
 
   Savefiles.init()
 
-  $s.cars = []
+  $s.ncars = 0
   $s.roads = []
   let intersections = []
   
@@ -69,7 +76,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
         $s.tool.begin = !$s.tool.begin
       } else console.log('Not enough routing objs')
     } else if ($s.tool.type == 'vehicleSource') {
-      new Routing.VehicleSource(e2.x, e2.y, {interval: $s.settings.vehTime, vehicles: $s.cars})
+      new Routing.VehicleSource(e2.x, e2.y, {interval: $s.settings.vehTime})
     } else if ($s.tool.type == 'vehicleSink') {
       new Routing.VehicleSink(e2.x, e2.y)
     } else if ($s.tool.type == 'intersection') {
@@ -82,12 +89,11 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   })
   
   $interval(() => {
-    $s.cars.forEach(car => {
+    Vehicle.getAll().forEach(car => {
       car.tick()
     })
-    for (let i = 0; i < $s.cars.length; i++) {
-      if ($s.cars[i].finished()) $s.cars.splice(i, 1)
-    }
+    Vehicle.removeDead()
+    $s.ncars = Vehicle.getAll().length
     
     $s.d.background('green')
 
@@ -118,8 +124,28 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       let closest = Routing.getClosest(new Point(lastMouse.x, lastMouse.y))
       if (closest) closest.drawHighlight($s.d)
     }
-    $s.cars.forEach(car => {
+    Vehicle.getAll().forEach(car => {
       car.draw($s.d, $s.settings.showWaypoints)
+    })
+    testCar.draw($s.d)
+    // let a = testCar.getCorners()
+    // $s.d.fill('red')
+    // $s.d.ellipse(a[0].x, a[0].y, 5)
+    // $s.d.ellipse(a[1].x, a[1].y, 5)
+
+    Vehicle.getAll().forEach(car => {
+      if (Point.distance(testCar.pos, car.pos) < 1.5 * Settings.CAR_LENGTH) {
+        $s.d.fill('red')
+        $s.d.ellipse(car.pos.x, car.pos.y, 20)
+      }
+
+      if ($s.settings.showVehCorners) {
+        let a = car.getCorners()
+        $s.d.fill('red')
+        a.forEach(b => {
+          $s.d.ellipse(b.x, b.y, 5)
+        })
+      }
     })
 
     if ($s.tool.begin) $s.d.line($s.tool.pos1.x, $s.tool.pos1.y, lastMouse.x, lastMouse.y)
@@ -132,10 +158,9 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
   $s.load = () => {
     // delete all routing objs else vehicle sources still generate
     Routing.getAll().forEach(robj => robj.delete())
-    // vehicles is returned because a new vehicles object is passed into the loaded vehicle sources
-    // this then needs to be linked back to $s.cars
+    // remove all current vehicles
+    Vehicle.clearAll()
     Savefiles.load('test.json', (_roads, _robjs, _ints, _vehicles) => {
-      $s.cars = _vehicles
       console.log('Loaded')
       $s.roads = _roads
       intersections = _ints

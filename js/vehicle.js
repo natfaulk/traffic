@@ -2,6 +2,8 @@ const Point = require('./point')
 const Settings = require('./settings')
 const Utils = require('./utils')
 
+let allVehicles = []
+
 module.exports = class Vehicle {
   constructor(_x = 0, _y = 0) {
     this.pos = new Point(_x, _y)
@@ -9,6 +11,7 @@ module.exports = class Vehicle {
     this.size = new Point(Settings.CAR_LENGTH, Settings.CAR_WIDTH)
     this.waypoints = []
     this.color = Utils.randomColour()
+    allVehicles.push(this)
   }
 
   draw(_d, _routing = false) {
@@ -18,7 +21,7 @@ module.exports = class Vehicle {
     _d.rotatedRect(this.pos.x, this.pos.y, this.size.x, this.size.y, this.angle, this.size.x, this.size.y / 2)
     if (_routing && this.waypoints.length > 0) {
       _d.fill('green')
-      _d.ellipse(this.waypoints[0].x, this.waypoints[0].y, 5)
+      _d.ellipse(this.waypoints[0].pos.x, this.waypoints[0].pos.y, 5)
     }
   }
 
@@ -28,7 +31,7 @@ module.exports = class Vehicle {
 
   tick() {
     if (this.waypoints.length > 0) {
-      let dest = this.waypoints[0]
+      let dest = this.waypoints[0].pos
       let d = Point.distance(this.pos, dest)
       if (d > Settings.DEST_THRESHOLD) {
         let a = Point.angle(dest, this.pos)
@@ -38,13 +41,68 @@ module.exports = class Vehicle {
         this.pos.add(t)
         this.angle = a
       } else {
-        this.waypoints.shift()
-        this.tick()
+        let tempTL = this.waypoints[0].trafficLight
+        if (tempTL === undefined || (tempTL !== undefined && tempTL == 'g')) {
+          this.waypoints.shift()
+          this.tick()
+        } else {
+          while (this.waypoints.length > 0) this.waypoints.shift()
+        }
       }
     }
   }
 
   finished() {
     return this.waypoints.length == 0
+  }
+
+  // returns coordinates of the corners
+  getCorners() {
+    let out = []
+    // top right
+    let t = new Point()
+    t.setFromPolar(this.angle - Math.PI / 2, this.size.y / 2)
+    t.add(this.pos)
+    out.push(t)
+    
+    // bottom right
+    t = new Point()
+    t.setFromPolar(this.angle + Math.PI / 2, this.size.y / 2)
+    t.add(this.pos)
+    out.push(t)
+
+    let t2 = new Point()
+    t2.setFromPolar(this.angle, -this.size.x)
+
+    // top left
+    t = new Point()
+    t.setFromPolar(this.angle - Math.PI / 2, this.size.y / 2)    
+    t.add(this.pos)
+    t.add(t2)
+    out.push(t)
+
+    // bottom left
+    t = new Point()
+    t.setFromPolar(this.angle + Math.PI / 2, this.size.y / 2)    
+    t.add(this.pos)
+    t.add(t2)
+    out.push(t)
+
+    return out
+  }
+
+  static getAll() {
+    return allVehicles
+  }
+
+  static clearAll() {
+    allVehicles = []
+  }
+
+  // remove all vehicles with no waypoints left
+  static removeDead() {
+    for (let i = 0; i < allVehicles.length; i++) {
+      if (allVehicles[i].finished()) allVehicles.splice(i, 1)
+    }
   }
 }

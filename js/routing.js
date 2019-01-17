@@ -94,13 +94,13 @@ module.exports = {
           while (timeout < Settings.MAX_WAYPOINTS) {
             let index = Math.floor(Math.random() * currentNode.children.length)
             let childNode = getByUid(currentNode.children[index])
-            tempVeh.addWaypoint(childNode.pos)
+            tempVeh.addWaypoint(childNode)
             currentNode = childNode
             timeout++
             if (currentNode.children.length <= 0) break
             // console.log(currentNode)
           }
-          _settings.vehicles.push(tempVeh)
+          Vehicle.getAll().push(tempVeh)
         }
       }, _settings.interval)
     }

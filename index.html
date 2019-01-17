@@ -16,6 +16,7 @@
       Grid snapping <input type="checkbox" ng-model="settings.gridSnap"><br>
       Show routing <input type="checkbox" ng-model="settings.showRouting"><br>
       Show vehicle waypoints <input type="checkbox" ng-model="settings.showWaypoints"><br>
+      Show vehicle corners <input type="checkbox" ng-model="settings.showVehCorners"><br>
       <button ng-click="roads=[]">Clear roads</button><br>
       Number of lanes <input type="text" ng-model="settings.numLanes">
       <br><br>
@@ -33,7 +34,7 @@
       <br>
       <button ng-click="save()">Save</button>
       <button ng-click="load()">Load</button>
-      <br>{{cars.length}}
+      <br>{{ncars}}
     </div>
     <script>require('angular')</script>
     <script>require('./js/index.js')</script>
