@@ -23,6 +23,10 @@ class Point {
     this.x += _p.x
     this.y += _p.y
   }
+  
+  copy() {
+    return new Point(this.x, this.y)
+  }
 
   static distance(a, b) {
     const dx = a.x - b.x
@@ -34,7 +38,7 @@ class Point {
   static angle(a, b) {
     return Math.atan2(a.y - b.y, a.x - b.x)
   }
-
+  
 }
 
 module.exports = Point

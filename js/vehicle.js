@@ -38,16 +38,28 @@ module.exports = class Vehicle {
         if (d > Settings.MAX_SPEED) d = Settings.MAX_SPEED
         let t = new Point()
         t.setFromPolar(a, d)
+
+        let savePos = this.pos.copy()
+        let saveAng = this.angle
         this.pos.add(t)
         this.angle = a
+
+        allVehicles.forEach(_veh => {
+          if (_veh != this && this.checkCollision(_veh)) {
+            this.pos = savePos
+            this.angle = saveAng
+          }
+        })
+
       } else {
         let tempTL = this.waypoints[0].trafficLight
         if (tempTL === undefined || (tempTL !== undefined && tempTL == 'g')) {
           this.waypoints.shift()
           this.tick()
-        } else {
-          while (this.waypoints.length > 0) this.waypoints.shift()
-        }
+        } 
+        // else {
+        //   while (this.waypoints.length > 0) this.waypoints.shift()
+        // }
       }
     }
   }
@@ -89,6 +101,10 @@ module.exports = class Vehicle {
     out.push(t)
 
     return out
+  }
+
+  checkCollision(_car) {
+    return Point.distance(this.pos, _car.pos) < 1.5 * Settings.CAR_LENGTH
   }
 
   static getAll() {

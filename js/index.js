@@ -134,7 +134,7 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
     // $s.d.ellipse(a[1].x, a[1].y, 5)
 
     Vehicle.getAll().forEach(car => {
-      if (Point.distance(testCar.pos, car.pos) < 1.5 * Settings.CAR_LENGTH) {
+      if (testCar.checkCollision(car)) {
         $s.d.fill('red')
         $s.d.ellipse(car.pos.x, car.pos.y, 20)
       }

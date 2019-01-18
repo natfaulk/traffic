@@ -85,22 +85,30 @@ module.exports = {
   VehicleSource: class extends Routable {
     constructor(_x = 0, _y = 0, _settings = {}) {
       super(_x, _y)
+      this.latestCar = null
       this.intervalTime = _settings.interval
       if (_settings.interval > 0) this.interval = setInterval(() => {
         if (this.children.length > 0) {
-          let tempVeh = new Vehicle(this.pos.x, this.pos.y)
-          let currentNode = this
-          let timeout = 0
-          while (timeout < Settings.MAX_WAYPOINTS) {
-            let index = Math.floor(Math.random() * currentNode.children.length)
-            let childNode = getByUid(currentNode.children[index])
-            tempVeh.addWaypoint(childNode)
-            currentNode = childNode
-            timeout++
-            if (currentNode.children.length <= 0) break
-            // console.log(currentNode)
+          // check that the latest car is far enough out of the way
+          if (this.latestCar === null
+            || this.latestCar.finished()
+            || !this.latestCar.checkCollision(this)
+          ) {
+            let tempVeh = new Vehicle(this.pos.x, this.pos.y)
+            let currentNode = this
+            let timeout = 0
+            while (timeout < Settings.MAX_WAYPOINTS) {
+              let index = Math.floor(Math.random() * currentNode.children.length)
+              let childNode = getByUid(currentNode.children[index])
+              tempVeh.addWaypoint(childNode)
+              currentNode = childNode
+              timeout++
+              if (currentNode.children.length <= 0) break
+              // console.log(currentNode)
+            }
+            Vehicle.getAll().push(tempVeh)
+            this.latestCar = tempVeh
           }
-          Vehicle.getAll().push(tempVeh)
         }
       }, _settings.interval)
     }
