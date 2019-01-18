@@ -106,7 +106,7 @@ module.exports = {
               if (currentNode.children.length <= 0) break
               // console.log(currentNode)
             }
-            Vehicle.getAll().push(tempVeh)
+            // Vehicle.getAll().push(tempVeh)
             this.latestCar = tempVeh
           }
         }
