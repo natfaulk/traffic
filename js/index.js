@@ -85,6 +85,14 @@ myApp.controller('display', ['$scope', '$interval', function($s, $interval) {
       intersections.push(new Routing.Intersection4_1(e2.x, e2.y, $s.settings.intRad, $s.settings.intSpac))
     } else if ($s.tool.type == 'inspect') {
       console.log(Routing.getClosest(new Point(lastMouse.x, lastMouse.y)))
+    } else if ($s.tool.type == 'light') {
+      let t_node = Routing.getClosest(new Point(lastMouse.x, lastMouse.y))
+      if (t_node.__proto__.constructor.name == 'IntersectionNode') {
+        if (t_node.trafficLight === undefined) t_node.trafficLight = 'r'
+        else if (t_node.trafficLight === 'r') t_node.trafficLight = 'y'
+        else if (t_node.trafficLight === 'y') t_node.trafficLight = 'g'
+        else if (t_node.trafficLight === 'g') t_node.trafficLight = 'r'
+      }
     }
   })
   
