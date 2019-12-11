@@ -9,8 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "angular": "^1.7.5",
-    "electron": "^3.0.12",
+    "angular": "^1.7.9",
+    "electron": "^3.1.13",
     "mindrawingjs": "git+https://github.com/natfaulk/mindrawingjs.git"
   }
 }
